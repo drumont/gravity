@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "proto/container/pb";
+
+package container;
+
+service ContainerService {
+  rpc RunContainer(RunContainerRequest) returns (RunContainerResponse);
+  rpc StopContainer(StopContainerRequest) returns (StopContainerResponse);
+  rpc GetContainerStatus(GetContainerStatusRequest) returns (GetContainerStatusResponse);
+  rpc StreamUsage(UsageRequest) returns (stream UsageResponse);
+}
+
+message RunContainerRequest {
+  string requestId = 1; // Unique identifier for the request
+  string image = 2;
+  double vcpu = 3;
+  int64 memory = 4;
+  map<string, string> env = 5;
+  repeated int32 ports = 6;
+}
+
+message RunContainerResponse {
+  string containerId= 1;
+}
+
+message StopContainerRequest {
+  string containerId = 1;
+}
+
+message StopContainerResponse {}
+
+message GetContainerStatusRequest {
+  string containerId = 1;
+}
+
+message GetContainerStatusResponse {
+  string status = 1;
+  double vcpu_seconds = 2;
+  double ram_mb_seconds = 3;
+}
+
+message UsageRequest {
+  string user_id = 1;
+}
+
+message UsageResponse {
+  string containerId = 1;
+  double vcpu_seconds = 2;
+  double ram_mb_seconds = 3;
+  string timestamp = 4;
+}
