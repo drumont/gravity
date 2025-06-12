@@ -21,8 +21,8 @@ func initLogger() {
 	log.SetLevel(log.DebugLevel)
 }
 
-func (s *gravityServer) RegisterContainer(ctx context.Context, req *cb.RunContainerRequest) (*cb.RunContainerResponse, error) {
-	return services.Register(ctx, req)
+func (s *gravityServer) RunContainer(ctx context.Context, req *cb.RunContainerRequest) (*cb.RunContainerResponse, error) {
+	return services.Run(ctx, req)
 }
 
 func main() {

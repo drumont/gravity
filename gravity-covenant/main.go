@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	cb "gravity/proto/container/pb"
 	"os"
+	"time"
 )
 
 func initLogger() {
@@ -42,20 +45,36 @@ func main() {
 	// - Optionally, implement a monitoring system
 	// initLogger()
 	var id = uuid.New().String()
-	log.Infof("Starting worker on local with id: %s", id)
-	var masterAddress string = "192.168.1.17:50051"
+	log.Infof("Starting covenant on local with id: %s", id)
+	var agentAddress string = "192.168.1.17:50051"
 
-	log.Infof("Connecting to master at %s", masterAddress)
-
-	connexion, err := grpc.NewClient(masterAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-
+	log.Infof("Connecting with agent at %s", agentAddress)
+	connexion, err := grpc.NewClient(agentAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect to master: %v", err)
+		log.Fatalf("Failed to connect to agent: %v", err)
 	}
 	defer connexion.Close()
+	log.Infof("Connected to agent at %s", agentAddress)
 
-	// registerClient := rb.NewRegisterWorkerClient(connexion)
+	containerClient := cb.NewContainerServiceClient(connexion)
+	req := &cb.RunContainerRequest{
+		RequestId: id,
+		Memory:    1024, // 1 GB
+		Vcpu:      3,
+		Image:     "gravity-covenant:latest",
+		Env:       map[string]string{"ENV_VAR": "value"},
+		Ports:     make([]int32, 0),
+	}
 
-	log.Infof("Connected to master at %s", masterAddress)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	resp, err := containerClient.RunContainer(ctx, req)
+
+	if err != nil {
+		log.Fatalf("Failed to run container: %v", err)
+	} else {
+		log.Infof("Container registered successfully with ID: %s", resp.ContainerId)
+	}
 
 }
