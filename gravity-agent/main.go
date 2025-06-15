@@ -4,6 +4,7 @@ import (
 	"context"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"gravity/gravity-agent/providers"
 	"gravity/gravity-agent/services"
 	"net"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 type gravityServer struct {
 	cb.UnimplementedContainerServiceServer
+	containerService *services.ContainerService
 }
 
 func initLogger() {
@@ -22,7 +24,7 @@ func initLogger() {
 }
 
 func (s *gravityServer) RunContainer(ctx context.Context, req *cb.RunContainerRequest) (*cb.RunContainerResponse, error) {
-	return services.Run(ctx, req)
+	return s.containerService.Run(ctx, req)
 }
 
 func main() {
@@ -32,7 +34,11 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	cb.RegisterContainerServiceServer(grpcServer, &gravityServer{})
+
+	var dockerProvider = providers.NewDockerProvider(map[string]string{})
+	var containerService = services.NewContainerService(dockerProvider)
+
+	cb.RegisterContainerServiceServer(grpcServer, &gravityServer{containerService: containerService})
 
 	log.Println("Gravity agent server is listening on :50051")
 	if err := grpcServer.Serve(lis); err != nil {

@@ -60,8 +60,8 @@ func main() {
 	req := &cb.RunContainerRequest{
 		RequestId: id,
 		Memory:    1024, // 1 GB
-		Vcpu:      3,
-		Image:     "gravity-covenant:latest",
+		Vcpu:      1,
+		Image:     "nginx:latest",
 		Env:       map[string]string{"ENV_VAR": "value"},
 		Ports:     make([]int32, 0),
 	}

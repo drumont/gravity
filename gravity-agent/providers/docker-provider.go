@@ -13,21 +13,19 @@ type DockerProvider struct {
 	client *dockerclient.Client
 }
 
-func (dp *DockerProvider) NewDockerProvider(config map[string]string) *DockerProvider {
-	dp.config = config
-	if dp.client == nil {
-		log.Debug("Docker client is not initialized, initializing now")
-		var err error
-		dp.client, err = initClient()
-		if err != nil {
-			log.Fatalf("Failed to initialize Docker client: %v", err)
-			return nil
-		}
-		log.Debug("Docker client initialized successfully")
-	} else {
-		log.Debug("Docker client already initialized, reusing existing client")
+func NewDockerProvider(config map[string]string) *DockerProvider {
+	log.Debug("Creating new DockerProvider instance")
+	cli, err := initClient()
+	if err != nil {
+		log.Fatalf("Failed to initialize Docker client: %v", err)
+		return nil
 	}
-	return dp
+	log.Debug("Docker client initialized successfully")
+
+	return &DockerProvider{
+		config: config,
+		client: cli,
+	}
 }
 
 func (dp *DockerProvider) LaunchContainer(ctx context.Context, request map[string]string) (container.CreateResponse, error) {
