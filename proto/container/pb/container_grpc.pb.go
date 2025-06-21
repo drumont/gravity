@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ContainerService_RunContainer_FullMethodName       = "/container.ContainerService/RunContainer"
-	ContainerService_StopContainer_FullMethodName      = "/container.ContainerService/StopContainer"
-	ContainerService_GetContainerStatus_FullMethodName = "/container.ContainerService/GetContainerStatus"
-	ContainerService_StreamUsage_FullMethodName        = "/container.ContainerService/StreamUsage"
+	ContainerService_RunContainer_FullMethodName        = "/container.ContainerService/RunContainer"
+	ContainerService_StopContainer_FullMethodName       = "/container.ContainerService/StopContainer"
+	ContainerService_GetContainerStatus_FullMethodName  = "/container.ContainerService/GetContainerStatus"
+	ContainerService_StreamUsage_FullMethodName         = "/container.ContainerService/StreamUsage"
+	ContainerService_StreamContainerLogs_FullMethodName = "/container.ContainerService/StreamContainerLogs"
 )
 
 // ContainerServiceClient is the client API for ContainerService service.
@@ -33,6 +34,7 @@ type ContainerServiceClient interface {
 	StopContainer(ctx context.Context, in *StopContainerRequest, opts ...grpc.CallOption) (*StopContainerResponse, error)
 	GetContainerStatus(ctx context.Context, in *GetContainerStatusRequest, opts ...grpc.CallOption) (*GetContainerStatusResponse, error)
 	StreamUsage(ctx context.Context, in *UsageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UsageResponse], error)
+	StreamContainerLogs(ctx context.Context, in *StreamContainerLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamContainerLogsResponse], error)
 }
 
 type containerServiceClient struct {
@@ -92,6 +94,25 @@ func (c *containerServiceClient) StreamUsage(ctx context.Context, in *UsageReque
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ContainerService_StreamUsageClient = grpc.ServerStreamingClient[UsageResponse]
 
+func (c *containerServiceClient) StreamContainerLogs(ctx context.Context, in *StreamContainerLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamContainerLogsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ContainerService_ServiceDesc.Streams[1], ContainerService_StreamContainerLogs_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamContainerLogsRequest, StreamContainerLogsResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_StreamContainerLogsClient = grpc.ServerStreamingClient[StreamContainerLogsResponse]
+
 // ContainerServiceServer is the server API for ContainerService service.
 // All implementations must embed UnimplementedContainerServiceServer
 // for forward compatibility.
@@ -100,6 +121,7 @@ type ContainerServiceServer interface {
 	StopContainer(context.Context, *StopContainerRequest) (*StopContainerResponse, error)
 	GetContainerStatus(context.Context, *GetContainerStatusRequest) (*GetContainerStatusResponse, error)
 	StreamUsage(*UsageRequest, grpc.ServerStreamingServer[UsageResponse]) error
+	StreamContainerLogs(*StreamContainerLogsRequest, grpc.ServerStreamingServer[StreamContainerLogsResponse]) error
 	mustEmbedUnimplementedContainerServiceServer()
 }
 
@@ -121,6 +143,9 @@ func (UnimplementedContainerServiceServer) GetContainerStatus(context.Context, *
 }
 func (UnimplementedContainerServiceServer) StreamUsage(*UsageRequest, grpc.ServerStreamingServer[UsageResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method StreamUsage not implemented")
+}
+func (UnimplementedContainerServiceServer) StreamContainerLogs(*StreamContainerLogsRequest, grpc.ServerStreamingServer[StreamContainerLogsResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamContainerLogs not implemented")
 }
 func (UnimplementedContainerServiceServer) mustEmbedUnimplementedContainerServiceServer() {}
 func (UnimplementedContainerServiceServer) testEmbeddedByValue()                          {}
@@ -208,6 +233,17 @@ func _ContainerService_StreamUsage_Handler(srv interface{}, stream grpc.ServerSt
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ContainerService_StreamUsageServer = grpc.ServerStreamingServer[UsageResponse]
 
+func _ContainerService_StreamContainerLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamContainerLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ContainerServiceServer).StreamContainerLogs(m, &grpc.GenericServerStream[StreamContainerLogsRequest, StreamContainerLogsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_StreamContainerLogsServer = grpc.ServerStreamingServer[StreamContainerLogsResponse]
+
 // ContainerService_ServiceDesc is the grpc.ServiceDesc for ContainerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -232,6 +268,11 @@ var ContainerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "StreamUsage",
 			Handler:       _ContainerService_StreamUsage_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamContainerLogs",
+			Handler:       _ContainerService_StreamContainerLogs_Handler,
 			ServerStreams: true,
 		},
 	},

@@ -445,6 +445,110 @@ func (x *UsageResponse) GetTimestamp() string {
 	return ""
 }
 
+type StreamContainerLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerId   string                 `protobuf:"bytes,1,opt,name=containerId,proto3" json:"containerId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamContainerLogsRequest) Reset() {
+	*x = StreamContainerLogsRequest{}
+	mi := &file_proto_container_container_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamContainerLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamContainerLogsRequest) ProtoMessage() {}
+
+func (x *StreamContainerLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_container_container_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamContainerLogsRequest.ProtoReflect.Descriptor instead.
+func (*StreamContainerLogsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_container_container_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *StreamContainerLogsRequest) GetContainerId() string {
+	if x != nil {
+		return x.ContainerId
+	}
+	return ""
+}
+
+type StreamContainerLogsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerId   string                 `protobuf:"bytes,1,opt,name=containerId,proto3" json:"containerId,omitempty"`
+	Log           string                 `protobuf:"bytes,2,opt,name=log,proto3" json:"log,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // ISO 8601 format
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamContainerLogsResponse) Reset() {
+	*x = StreamContainerLogsResponse{}
+	mi := &file_proto_container_container_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamContainerLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamContainerLogsResponse) ProtoMessage() {}
+
+func (x *StreamContainerLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_container_container_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamContainerLogsResponse.ProtoReflect.Descriptor instead.
+func (*StreamContainerLogsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_container_container_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *StreamContainerLogsResponse) GetContainerId() string {
+	if x != nil {
+		return x.ContainerId
+	}
+	return ""
+}
+
+func (x *StreamContainerLogsResponse) GetLog() string {
+	if x != nil {
+		return x.Log
+	}
+	return ""
+}
+
+func (x *StreamContainerLogsResponse) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
 var File_proto_container_container_proto protoreflect.FileDescriptor
 
 const file_proto_container_container_proto_rawDesc = "" +
@@ -477,12 +581,19 @@ const file_proto_container_container_proto_rawDesc = "" +
 	"\vcontainerId\x18\x01 \x01(\tR\vcontainerId\x12!\n" +
 	"\fvcpu_seconds\x18\x02 \x01(\x01R\vvcpuSeconds\x12$\n" +
 	"\x0eram_mb_seconds\x18\x03 \x01(\x01R\framMbSeconds\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\tR\ttimestamp2\xde\x02\n" +
+	"\ttimestamp\x18\x04 \x01(\tR\ttimestamp\">\n" +
+	"\x1aStreamContainerLogsRequest\x12 \n" +
+	"\vcontainerId\x18\x01 \x01(\tR\vcontainerId\"o\n" +
+	"\x1bStreamContainerLogsResponse\x12 \n" +
+	"\vcontainerId\x18\x01 \x01(\tR\vcontainerId\x12\x10\n" +
+	"\x03log\x18\x02 \x01(\tR\x03log\x12\x1c\n" +
+	"\ttimestamp\x18\x03 \x01(\tR\ttimestamp2\xc6\x03\n" +
 	"\x10ContainerService\x12O\n" +
 	"\fRunContainer\x12\x1e.container.RunContainerRequest\x1a\x1f.container.RunContainerResponse\x12R\n" +
 	"\rStopContainer\x12\x1f.container.StopContainerRequest\x1a .container.StopContainerResponse\x12a\n" +
 	"\x12GetContainerStatus\x12$.container.GetContainerStatusRequest\x1a%.container.GetContainerStatusResponse\x12B\n" +
-	"\vStreamUsage\x12\x17.container.UsageRequest\x1a\x18.container.UsageResponse0\x01B\x14Z\x12proto/container/pbb\x06proto3"
+	"\vStreamUsage\x12\x17.container.UsageRequest\x1a\x18.container.UsageResponse0\x01\x12f\n" +
+	"\x13StreamContainerLogs\x12%.container.StreamContainerLogsRequest\x1a&.container.StreamContainerLogsResponse0\x01B\x14Z\x12proto/container/pbb\x06proto3"
 
 var (
 	file_proto_container_container_proto_rawDescOnce sync.Once
@@ -496,33 +607,37 @@ func file_proto_container_container_proto_rawDescGZIP() []byte {
 	return file_proto_container_container_proto_rawDescData
 }
 
-var file_proto_container_container_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_container_container_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_container_container_proto_goTypes = []any{
-	(*RunContainerRequest)(nil),        // 0: container.RunContainerRequest
-	(*RunContainerResponse)(nil),       // 1: container.RunContainerResponse
-	(*StopContainerRequest)(nil),       // 2: container.StopContainerRequest
-	(*StopContainerResponse)(nil),      // 3: container.StopContainerResponse
-	(*GetContainerStatusRequest)(nil),  // 4: container.GetContainerStatusRequest
-	(*GetContainerStatusResponse)(nil), // 5: container.GetContainerStatusResponse
-	(*UsageRequest)(nil),               // 6: container.UsageRequest
-	(*UsageResponse)(nil),              // 7: container.UsageResponse
-	nil,                                // 8: container.RunContainerRequest.EnvEntry
+	(*RunContainerRequest)(nil),         // 0: container.RunContainerRequest
+	(*RunContainerResponse)(nil),        // 1: container.RunContainerResponse
+	(*StopContainerRequest)(nil),        // 2: container.StopContainerRequest
+	(*StopContainerResponse)(nil),       // 3: container.StopContainerResponse
+	(*GetContainerStatusRequest)(nil),   // 4: container.GetContainerStatusRequest
+	(*GetContainerStatusResponse)(nil),  // 5: container.GetContainerStatusResponse
+	(*UsageRequest)(nil),                // 6: container.UsageRequest
+	(*UsageResponse)(nil),               // 7: container.UsageResponse
+	(*StreamContainerLogsRequest)(nil),  // 8: container.StreamContainerLogsRequest
+	(*StreamContainerLogsResponse)(nil), // 9: container.StreamContainerLogsResponse
+	nil,                                 // 10: container.RunContainerRequest.EnvEntry
 }
 var file_proto_container_container_proto_depIdxs = []int32{
-	8, // 0: container.RunContainerRequest.env:type_name -> container.RunContainerRequest.EnvEntry
-	0, // 1: container.ContainerService.RunContainer:input_type -> container.RunContainerRequest
-	2, // 2: container.ContainerService.StopContainer:input_type -> container.StopContainerRequest
-	4, // 3: container.ContainerService.GetContainerStatus:input_type -> container.GetContainerStatusRequest
-	6, // 4: container.ContainerService.StreamUsage:input_type -> container.UsageRequest
-	1, // 5: container.ContainerService.RunContainer:output_type -> container.RunContainerResponse
-	3, // 6: container.ContainerService.StopContainer:output_type -> container.StopContainerResponse
-	5, // 7: container.ContainerService.GetContainerStatus:output_type -> container.GetContainerStatusResponse
-	7, // 8: container.ContainerService.StreamUsage:output_type -> container.UsageResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	10, // 0: container.RunContainerRequest.env:type_name -> container.RunContainerRequest.EnvEntry
+	0,  // 1: container.ContainerService.RunContainer:input_type -> container.RunContainerRequest
+	2,  // 2: container.ContainerService.StopContainer:input_type -> container.StopContainerRequest
+	4,  // 3: container.ContainerService.GetContainerStatus:input_type -> container.GetContainerStatusRequest
+	6,  // 4: container.ContainerService.StreamUsage:input_type -> container.UsageRequest
+	8,  // 5: container.ContainerService.StreamContainerLogs:input_type -> container.StreamContainerLogsRequest
+	1,  // 6: container.ContainerService.RunContainer:output_type -> container.RunContainerResponse
+	3,  // 7: container.ContainerService.StopContainer:output_type -> container.StopContainerResponse
+	5,  // 8: container.ContainerService.GetContainerStatus:output_type -> container.GetContainerStatusResponse
+	7,  // 9: container.ContainerService.StreamUsage:output_type -> container.UsageResponse
+	9,  // 10: container.ContainerService.StreamContainerLogs:output_type -> container.StreamContainerLogsResponse
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_container_container_proto_init() }
@@ -536,7 +651,7 @@ func file_proto_container_container_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_container_container_proto_rawDesc), len(file_proto_container_container_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -27,6 +27,11 @@ func (s *gravityServer) RunContainer(ctx context.Context, req *cb.RunContainerRe
 	return s.containerService.Run(ctx, req)
 }
 
+func (s *gravityServer) StreamContainerLogs(req *cb.StreamContainerLogsRequest,
+	stream cb.ContainerService_StreamContainerLogsServer) error {
+	return s.containerService.StreamContainerLogs(req, stream)
+}
+
 func main() {
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {

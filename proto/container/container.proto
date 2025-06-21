@@ -9,6 +9,8 @@ service ContainerService {
   rpc StopContainer(StopContainerRequest) returns (StopContainerResponse);
   rpc GetContainerStatus(GetContainerStatusRequest) returns (GetContainerStatusResponse);
   rpc StreamUsage(UsageRequest) returns (stream UsageResponse);
+  rpc StreamContainerLogs(StreamContainerLogsRequest) returns (stream StreamContainerLogsResponse);
+
 }
 
 message RunContainerRequest {
@@ -49,4 +51,14 @@ message UsageResponse {
   double vcpu_seconds = 2;
   double ram_mb_seconds = 3;
   string timestamp = 4;
+}
+
+message StreamContainerLogsRequest {
+  string containerId = 1;
+}
+
+message StreamContainerLogsResponse {
+  string containerId = 1;
+  string log = 2;
+  string timestamp = 3; // ISO 8601 format
 }

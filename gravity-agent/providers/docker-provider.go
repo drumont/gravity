@@ -2,10 +2,10 @@ package providers
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/docker/docker/api/types/container"
 	dockerclient "github.com/docker/docker/client"
+	log "github.com/sirupsen/logrus"
+	"io"
 )
 
 type DockerProvider struct {
@@ -49,6 +49,26 @@ func (dp *DockerProvider) LaunchContainer(ctx context.Context, request map[strin
 
 	log.Infof("Container launched successfully")
 	return resp, nil
+}
+
+func (dp *DockerProvider) RetrieveLogs(containerId string) (io.ReadCloser, error) {
+	log.Infof("Retrieving logs for container ID: %s", containerId)
+	// Here you would typically use dp.client to retrieve logs
+	// For now, we just log the action
+	// For now, we just log the action
+	opts := container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Follow:     false,
+		Tail:       "all",
+	}
+	reader, err := dp.client.ContainerLogs(context.Background(), containerId, opts)
+	if err != nil {
+		log.Errorf("Failed to retrieve logs for container %s: %v", containerId, err)
+		return nil, err
+	}
+	log.Debugf("Logs retrieved successfully for container ID: %s", containerId)
+	return reader, nil
 }
 
 func initClient() (*dockerclient.Client, error) {

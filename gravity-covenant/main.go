@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"gravity/gravity-covenant/features"
 	cb "gravity/proto/container/pb"
 	"os"
-	"time"
 )
 
 func initLogger() {
@@ -57,6 +56,7 @@ func main() {
 	log.Infof("Connected to agent at %s", agentAddress)
 
 	containerClient := cb.NewContainerServiceClient(connexion)
+
 	req := &cb.RunContainerRequest{
 		RequestId: id,
 		Memory:    1024, // 1 GB
@@ -66,15 +66,16 @@ func main() {
 		Ports:     make([]int32, 0),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	resp, err := containerClient.RunContainer(ctx, req)
-
+	resp, err := features.RunContainer(containerClient, req)
 	if err != nil {
 		log.Fatalf("Failed to run container: %v", err)
-	} else {
-		log.Infof("Container registered successfully with ID: %s", resp.ContainerId)
 	}
+	log.Infof("Container registered successfully with ID: %s", resp.ContainerId)
 
+	err = features.StreamContainerLogs(containerClient, &cb.StreamContainerLogsRequest{
+		ContainerId: resp.ContainerId,
+	})
+	if err != nil {
+		log.Fatalf("Failed to stream container logs: %v", err)
+	}
 }

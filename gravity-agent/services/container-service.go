@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	log "github.com/sirupsen/logrus"
@@ -19,7 +20,7 @@ func NewContainerService(dockerProvider *providers.DockerProvider) *ContainerSer
 	}
 }
 
-func (cs ContainerService) Run(ctx context.Context, req *cb.RunContainerRequest) (*cb.RunContainerResponse, error) {
+func (cs *ContainerService) Run(ctx context.Context, req *cb.RunContainerRequest) (*cb.RunContainerResponse, error) {
 	log.Infof("Received registration for container ID: %s", req.RequestId)
 
 	// Here you would typically handle the registration logic, such as storing the container info.
@@ -46,6 +47,44 @@ func (cs ContainerService) Run(ctx context.Context, req *cb.RunContainerRequest)
 	return &cb.RunContainerResponse{
 		ContainerId: resp.ID,
 	}, nil
+}
+
+func (cs *ContainerService) StreamContainerLogs(req *cb.StreamContainerLogsRequest,
+	stream cb.ContainerService_StreamContainerLogsServer) error {
+	log.Debugf("Streaming logs for container ID: %s", req.ContainerId)
+	if req.ContainerId == "" {
+		log.Error("Container ID is empty")
+		return errors.New("container ID cannot be empty")
+	}
+	logReader, err := cs.dockerProvider.RetrieveLogs(req.ContainerId)
+	if err != nil {
+		log.Errorf("Failed to retrieve logs for container ID %s: %v", req.ContainerId, err)
+	}
+	defer logReader.Close()
+	scanner := bufio.NewScanner(logReader)
+	for scanner.Scan() {
+		select {
+		case <-stream.Context().Done():
+			log.Infof("Stream context done for container ID %s", req.ContainerId)
+			return stream.Context().Err()
+		default:
+			logLine := scanner.Text()
+			if err := stream.Send(&cb.StreamContainerLogsResponse{
+				ContainerId: req.ContainerId,
+				Log:         logLine,
+			}); err != nil {
+				log.Errorf("Failed to send log stream response for container ID %s: %v", req.ContainerId, err)
+				return err
+			}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Errorf("Error reading logs for container ID %s: %v", req.ContainerId, err)
+
+		return err
+	}
+
+	return errors.New("no logs to stream")
 }
 
 func verifyHostResources(memory int64, vCpu float64) error {
